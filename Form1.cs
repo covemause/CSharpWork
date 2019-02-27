@@ -48,9 +48,12 @@ namespace sample001
         {
             cts = new CancellationTokenSource();
             bc = new BlockingCollection<string>();
+            WorkData wkdt = new WorkData();
+            cmdBase cmd = new cmdBase();
 
             Task.Run(() =>
             {
+
                 while (cts.IsCancellationRequested == false)
                 {
                     string s;
@@ -67,12 +70,38 @@ namespace sample001
                     // 処理開始msg
                     LabelRefresh(s);
 
+                    string wk = s.Substring(s.Length - 1, 1);
+
+                    if (wk.Length != 0)
+                    {
+                        int tmp = 0;
+                        int.TryParse(wk, out tmp);
+                        if (tmp != 0 )
+                        {
+                            // 末尾の数値が偶数ならA、奇数ならBを実行
+                            if (tmp % 2 == 0)
+                            {
+                                cmd = new cmdPatternA();
+                            }
+                            else
+                            {
+                                cmd = new cmdPatternB();
+                            }
+
+                            cmd.SetWork(wkdt);
+                            cmd.AddCount();
+                            
+                        }
+                    }
+
                     // 重い処理
                     for (int i= 0; i<1000000000;i++)
                     {
                         int x =0;
                         x += 1;
                     }
+
+
 
                     // 処理完了msg
                     AddMessage(DateTime.Now.ToString() + " " + s);
